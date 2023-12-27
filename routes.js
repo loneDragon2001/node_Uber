@@ -13,7 +13,7 @@ router.get('/api/users', UserController.getAllUsers);
 
 
 
-router.post('/api/sendUserData', UserController.sendUserData);
+router.post('/api/sendUserData', upload.fields([{ name: 'userPhoto' }]), UserController.sendUserData);
 
 
 router.post('/api/sendRiderData', upload.fields([{ name: 'rcPhoto' }, { name: 'proofOfIdentity' }, { name: 'proofOfAddress' }]), RiderController.sendRiderData);

@@ -16,30 +16,6 @@ const collection1 = db.collection('rider_registration'); // Change this to your 
 const collection2 = db.collection('user_registration'); // Change this to your collection name
 
 
-// const loginMiddleware = async (req, res, next) => {
-//   try {
-//     const { username, password } = req.body;
-
-//     // Replace this with your actual database logic to check the user's credentials
-//     const user = await collection.findOne({username, password});
-
-//     if (!user) {
-//       return res.status(401).json({ error: 'Invalid username or password' });
-//     }
-
-//     // Generate a JWT token
-//     const token = jwt.sign({ userId: user.id, username: user.username }, config.jwtSecret, { expiresIn: '1h' });
-
-//     // Attach the user and token to the request for later use
-//     req.user = user;
-//     req.token = token;
-
-//     next();
-//   } catch (error) {
-//     console.error('Login error:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// };
 const loginMiddleware = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -47,6 +23,14 @@ const loginMiddleware = async (req, res, next) => {
     // Assuming collection1 and collection2 are your MongoDB collections
     const user1 = await collection1.findOne({ email, password });
     const user2 = await collection2.findOne({ email, password });
+
+     let collectionName = null;
+
+    if (user1) {
+      collectionName = 'rider';
+    } else if (user2) {
+      collectionName = 'user';
+    }
 
     if (!user1 && !user2) {
       return res.status(401).json({ error: 'Invalid username or password' });
@@ -61,6 +45,8 @@ const loginMiddleware = async (req, res, next) => {
     // Attach the user and token to the request for later use
     req.user = user;
     req.token = token;
+    req.collectionName = collectionName;
+    res.status(200).json({ token, collectionName });
 
     next();
   } catch (error) {

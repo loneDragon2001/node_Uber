@@ -1,13 +1,25 @@
 const Rider = require("../models/rider");
+const User = require("../models/User");
 
 class RiderService {
   async postRiderData(userData, rcPhotoBase64, proofOfIdentityBase64, proofOfAddressBase64){
     try {
       // Check if email or mobile already exists
-      const existingUser = await Rider.findOne({
+      const existingRider = await Rider.findOne({
         $or: [
           { email: userData.email },
           { mobileNo: userData.mobileNo },
+        ],
+      });
+
+      if (existingRider) {
+        throw new Error('Rider already registered with this email or phone number');
+      }
+
+      const existingUser = await User.findOne({
+        $or: [
+          { email: userData.email },
+          { mobile: userData.mobileNo },
         ],
       });
 
@@ -29,7 +41,7 @@ class RiderService {
       return { message: 'Data inserted successfully', insertedId: savedUser._id };
     } catch (error) {
       console.error(error);
-      throw new Error('Internal Server Error');
+      throw { status: 400, message: error.message }; // Adjust the status code as needed
     }
   }
 

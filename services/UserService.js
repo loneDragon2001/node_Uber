@@ -1,12 +1,13 @@
 // UserService.js
 const User = require("../models/User");
 const { MongoClient } = require('mongodb');
+const Rider = require("../models/rider");
 
 const mongoURI = 'mongodb://localhost:27017';
 const dbName = 'Mak';
 
 class UserService{
-    async userDetails(userData) {
+    async userDetails(userData,userPhotoBase64) {
         try {
           // Check if email or mobile already exists
           const existingUser = await User.findOne({
@@ -19,9 +20,21 @@ class UserService{
           if (existingUser) {
             throw new Error('User already registered with this email or phone number');
           }
+
+          const existingRider = await Rider.findOne({
+            $or: [
+              { email: userData.email },
+              { mobileNo: userData.mobile },
+            ],
+          });
+    
+          if (existingRider) {
+            throw new Error('Rider already registered with this email or phone number');
+          }
     
           // Create a new user using the User model
           const newUser = new User(userData);
+          newUser.userPhoto = userPhotoBase64;
     
           // Save the new user to the database
           const savedUser = await newUser.save();
@@ -29,7 +42,8 @@ class UserService{
           return { message: 'Data inserted successfully', insertedId: savedUser._id };
         } catch (error) {
           console.error(error);
-          throw new Error('Internal Server Error');
+          // throw new Error('Internal Server Error');
+          throw error;
         }
       }
 

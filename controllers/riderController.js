@@ -33,7 +33,11 @@ const RiderController = {
       res.status(201).json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      if (error.status && error.message) {
+        res.status(error.status).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     }
   },
 
