@@ -3,6 +3,7 @@ const User = require("../models/User");
 const { MongoClient } = require('mongodb');
 const Rider = require("../models/rider");
 
+
 const mongoURI = 'mongodb://localhost:27017';
 const dbName = 'Mak';
 
@@ -63,6 +64,28 @@ class UserService{
           }
     
           return users;
+        } catch (error) {
+          console.error(error);
+          throw new Error('Internal Server Error');
+        }
+      }
+
+      async getUserByEmail(userEmail) {
+        try {
+          const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+          await client.connect();
+    
+          const db = client.db(dbName);
+          const collection = db.collection('user_registration'); // Change this to your collection name
+          const user = await collection.findOne({ email: userEmail });
+    
+          await client.close();
+    
+          if (!user) {
+            throw new Error('User not found');
+          }
+    
+          return user;
         } catch (error) {
           console.error(error);
           throw new Error('Internal Server Error');

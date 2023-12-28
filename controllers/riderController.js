@@ -14,13 +14,9 @@ const RiderController = {
       const userData = JSON.parse(req.body.userData); // Parse the JSON string
 
       // Access file buffers from req.files
-      const rcPhotoBuffer = req.files["rcPhoto"][0].buffer;
-      const proofOfIdentityBuffer = req.files["proofOfIdentity"][0].buffer;
-      const proofOfAddressBuffer = req.files["proofOfAddress"][0].buffer;
-
-      const rcPhotoBase64 = rcPhotoBuffer.toString("base64");
-      const proofOfIdentityBase64 = proofOfIdentityBuffer.toString("base64");
-      const proofOfAddressBase64 = proofOfAddressBuffer.toString("base64");
+      const rcPhotoBase64 = req.files["rcPhoto"];
+      const proofOfIdentityBase64 = req.files["proofOfIdentity"];
+      const proofOfAddressBase64 = req.files["proofOfAddress"];
 
       // Call the service function
       const result = await riderService.postRiderData(
